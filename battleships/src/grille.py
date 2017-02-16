@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.random import randint
 from random import choice
+from functools import reduce
 import matplotlib.pyplot as plt
 
 # Longueurs des bateaux
@@ -31,7 +32,7 @@ class Grille(np.ndarray):
 
     def cases(self, bateau, position, direction):
         return self[self.slice_index(bateau, position, direction)]
-    
+
     def peut_placer(self, bateau, position, direction):
         try:
             return (self.cases(bateau, position, direction) == 0).all()
@@ -53,6 +54,13 @@ class Grille(np.ndarray):
 
     def affiche(self):
         plt.imshow(self, interpolation='nearest')
+
+    def shoot(self, position):
+        x, y = position
+        if self[x][y]:
+            self[x][y] = 0
+            return True
+        return False
 
     @staticmethod
     def eq(grilleA, grilleB):
