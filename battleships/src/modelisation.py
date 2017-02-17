@@ -63,6 +63,5 @@ if __name__ == '__main__':
     plt.plot(x, y, label='théorique')
     x, y = dist_exp
     plt.plot(x, y, label='expérimentale')
-    plt.title("Distribution du nombre de coups joués : version aléatoire")
     plt.legend()
     plt.show()
