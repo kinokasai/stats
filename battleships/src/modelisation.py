@@ -29,12 +29,12 @@ def aleatoire(grille):
 def dist_theorique_aleatoire():
     X = []
     P = []
-    nb_jeux_joues = 0
+    tmp = 0
     nb_jeux_total = C(17,100)
     for x in range(17,101):
         nb_jeux_en_x_coups = C(17,x)
-        p = (nb_jeux_en_x_coups - nb_jeux_joues) / nb_jeux_total
-        nb_jeux_joues = nb_jeux_en_x_coups
+        p = (nb_jeux_en_x_coups - tmp) / nb_jeux_total
+        tmp = nb_jeux_en_x_coups
         X.append(x)
         P.append(p)
     return (X,P)
@@ -60,7 +60,9 @@ if __name__ == '__main__':
     print("Espérance théorique:", esperance(dist_theo))
     print("Espérance expérimentale:", esperance(dist_exp))
     x, y = dist_theo
-    plt.plot(x, y)
+    plt.plot(x, y, label='théorique')
     x, y = dist_exp
-    plt.plot(x, y)
+    plt.plot(x, y, label='expérimentale')
+    plt.title("Distribution du nombre de coups joués : version aléatoire")
+    plt.legend()
     plt.show()

@@ -10,6 +10,11 @@ def nb_placements_bateau(bateau, grille):
             for position in positions(grille) \
             for direction in DIR.keys())
 
+def nb_placements_bateau_theorique(bateau, grille):
+    m, n = grille.shape
+    l = LONG[bateau]
+    return (m-l+1) * n + (n-l+1) * m
+
 def nb_placements_liste_bateaux(bateaux, grille):
     # Cas de base
     if len(bateaux) == 0:
@@ -42,5 +47,8 @@ def nb_approx_placements_liste_bateaux(bateaux, grille):
 if __name__ == '__main__':
     G = Grille()
     # print(nb_placements_bateau(1, G))
-    print(nb_placements_liste_bateaux([1,2,3], G))
+    for b in LONG.keys():
+        print(LONG[b])
+        print(nb_placements_bateau_theorique(b, G))
+        print(nb_placements_bateau(b, G))
     # print(nb_approx_placements_liste_bateaux([1,2], G))
