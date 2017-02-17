@@ -3,6 +3,7 @@ from numpy.random import randint
 from random import choice
 from functools import reduce
 import matplotlib.pyplot as plt
+import pdb
 
 # Longueurs des bateaux
 LONG = {
@@ -20,6 +21,9 @@ DIR = {
 }
 
 class Grille(np.ndarray):
+    def __init__(self):
+        self.boats = {}
+
     def __new__(cls, taille=(10,10)):
         return np.zeros(taille).view(cls)
 
@@ -28,21 +32,28 @@ class Grille(np.ndarray):
         j2, i2 = np.array(position) + np.array(DIR[direction]) * LONG[bateau]
         lj = [j1] * LONG[bateau] if j1 == j2 else list(range(j1,j2))
         li = [i1] * LONG[bateau] if i1 == i2 else list(range(i1,i2))
+        for i, j in zip(lj, li):
+            if i < 0 or j < 0:
+                raise IndexError
         return [lj,li]
 
     def cases(self, bateau, position, direction):
         return self[self.slice_index(bateau, position, direction)]
 
+    # This fucking takes a (y, x)!
     def peut_placer(self, bateau, position, direction):
         try:
-            return (self.cases(bateau, position, direction) == 0).all()
+            cases = self.cases(bateau, position, direction)
+            return (cases == 0).all()
         except IndexError:
             return False
 
     def place(self, bateau, position, direction):
         if self.peut_placer(bateau, position, direction):
-            i = self.slice_index(bateau, position, direction)
-            self[i] = np.array([bateau] * LONG[bateau]).reshape(self[i].shape)
+            slice = self.slice_index(bateau, position, direction)
+            boat = np.array([bateau] * LONG[bateau]).reshape(self[slice].shape)
+            self.boats[bateau] = slice
+            self[slice] = boat
             return self
         else:
             return None
@@ -52,15 +63,45 @@ class Grille(np.ndarray):
         while self.place(bateau, (randint(h),randint(w)), choice(list(DIR.keys()))) is None:
             pass
 
+    def at(self, pos):
+        if self.shape != (10, 10):
+            self = self.reshape(10, 10)
+        x, y = pos
+        if x not in range(10) or y not in range(10):
+            return 0
+        return self[y][x]
+
+    def set(self, pos, value):
+        if self.shape != (10, 10):
+            self = self.reshape(10, 10)
+        x, y = pos
+        if x in range(10) and y in range(10):
+            self[y][x] = value
+
     def affiche(self):
         plt.imshow(self, interpolation='nearest')
 
+    def neighbors(self, pos):
+        x, y = pos
+        l = []
+        l.append(self.at((x + 1, y)))
+        l.append(self.at((x - 1, y)))
+        l.append(self.at((x, y + 1)))
+        l.append(self.at((x, y - 1)))
+        return l
+
+    # This returns a tuple saying if a boat hase been sunk.
+    # (1, 3) -> hit sunk third boat
+    # (0, -1) -> miss
+    # (1, -1) -> hit, nothing sunk
     def shoot(self, position):
         x, y = position
-        if self[x][y]:
-            self[x][y] = 0
-            return True
-        return False
+        boat_type = self.at(position)
+        neigh = self.neighbors(position)
+        slice = None
+        if boat_type not in neigh:
+            slice = self.boats[boat_type]
+        return (boat_type, slice)
 
     @staticmethod
     def eq(grilleA, grilleB):

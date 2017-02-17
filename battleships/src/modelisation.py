@@ -1,5 +1,6 @@
 from grille import *
 from combinatoire import *
+from game import *
 
 from scipy.signal import savgol_filter
 from scipy.stats import binom
@@ -8,23 +9,6 @@ import random
 fact = np.math.factorial
 def C(k,n):
     return fact(n) / (fact(k) * fact(n-k))
-
-def aleatoire(grille):
-    jeu = Grille()
-    cases_restantes = [tuple(pos) for pos in positions(jeu)]
-    nb_coups = 0
-    touches = 0
-    while touches < 17:
-        coup = random.choice(cases_restantes)
-        if jeu[coup] == 0:
-            if grille[coup] != 0:
-                jeu[coup] = 2
-                touches += 1
-            else:
-                jeu[coup] = 1
-            cases_restantes.remove(coup)
-            nb_coups += 1
-    return nb_coups
 
 def dist_theorique_aleatoire():
     X = []
@@ -41,9 +25,11 @@ def dist_theorique_aleatoire():
 
 def distribution(modelisation, N):
     dist = {}
-    G = Grille.genere_grille()
+    grid = Grille.genere_grille()
     for i in range(N):
-        n = modelisation(G)
+        n = modelisation(grid)
+        n = 0
+        print(modelisation())
         if n not in dist.keys():
             dist[n] = 1/N
         else:
@@ -61,7 +47,9 @@ if __name__ == '__main__':
     print("Espérance expérimentale:", esperance(dist_exp))
     x, y = dist_theo
     plt.plot(x, y, label='théorique')
+    dist_exp = distribution(HeuristicalPlayer().play, 1000)
     x, y = dist_exp
     plt.plot(x, y, label='expérimentale')
     plt.legend()
     plt.show()
+    plt.savefig("lol.png")
