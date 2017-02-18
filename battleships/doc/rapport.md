@@ -135,5 +135,6 @@ $$\pi_k \leftarrow \frac{\pi_k - \pi_kp_s}{1 - \pi_kp_s}$$
 Question 4
 ----------
 
-Pour mettre à jour $\pi_{i}$ pour $i \neq k$, on ajoute de manière uniforme la différence $\pi^t_k - \pi^{t-1}_k$, avec $\pi^t_k$ la nouvelle valeur de $\pi_k$, et $\pi^{t-1}_k$ la valeur de $\pi_k$ avant mise à jour :
-$$\pi^t_i \leftarrow \frac{1}{N-1} \left(\pi^t_k - \pi^{t-1}_k\right)$$
+Pour mettre à jour $\pi_{i}$ pour $i \neq k$, on ajoute de manière uniforme l'opposé de la différence $\pi^t_k - \pi^{t-1}_k$, avec $\pi^t_k$ la nouvelle valeur de $\pi_k$, et $\pi^{t-1}_k$ la valeur de $\pi_k$ avant mise à jour :
+$$\pi_i \leftarrow \pi_i - \frac{1}{N-1} \left(\pi^t_k - \pi^{t-1}_k\right)$$
+$\pi^t_k - \pi^{t-1}_k$ sera normalement toujours négatif, puisqu'une réponse négative du senseur doit intuitivement baisser la probabilité $\pi_k$. On aura donc constamment une légère augmentation des probabilités $\pi_i$ de localiser le sous-marin sur les autres cases.
