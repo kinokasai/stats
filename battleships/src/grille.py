@@ -94,10 +94,9 @@ class Grille(np.ndarray):
         l.append(self.at((x, y - 1)))
         return l
 
-    # This returns a tuple saying if a boat hase been sunk.
-    # (1, 3) -> hit sunk third boat
-    # (0, -1) -> miss
-    # (1, -1) -> hit, nothing sunk
+    # This returns a tuple saying if a boat has been hit/sunk
+    # boat_type returns if there's a hit, and slice only exists if it's been
+    # sunk.
     def shoot(self, position):
         y, x = position
         position = x, y

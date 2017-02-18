@@ -147,7 +147,7 @@ def prob_play(target, hitmap=None):
         shots += 1
 
         if shots >= 100:
-            print("Something weird happened")
+            print("Something weird happened (✿ ◕‿◕) ᓄ✂╰U╯")
             break
     return shots
 
