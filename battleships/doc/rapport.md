@@ -21,7 +21,7 @@ Question 1
 ----------
 
 Pour une grille vide $G \in \{0\}^{m \times n}$ et un bateau de longueur $l$, on peut calculer le nombre de placements possibles du bateau sur $G$, que l'on appelle $n_l$, avec la formule :
-$$n_l = (m - l + 1) * n + (n - l + 1) * m$$
+$$n_l = n \cdot (m - l + 1) + m \cdot (n - l + 1)$$
 Dans le fichier `combinatoire.py`, nous avons défini une fonction `nb_placements_bateau` permettant de calculer $n_l$ en énumérant toutes les combinaisons possibles sur une grille donnée à l'aide de la fonction `Grille.peut_placer`.
 
 En appliquant la formule précédente et en appelant la fonction `nb_placements_bateau` sur une grille vide de taille $10\times10$, on obtient bien des résultats identiques :
@@ -70,18 +70,18 @@ Version aléatoire
 
 Dans un premier temps, on cherche à exprimer la loi de probabilité de la variable aléatoire $X$ qui correspond au nombre de coups effectués pour gagner la partie.
 
-Pour ce faire, on peut modéliser notre univers, l'ensemble des grilles de jeu de taille $m \times n$ contenant $k$ tirs réussis ($k$ étant le nombre de cases occupées par les bateaux), comme l'ensemble des séquences de digits binaires $\Omega = \{(c_1,\ldots,c_{m*n}) \in \mathbb{B}^{m*n}\}$.\
-Un 1 correspond à un tir réussi, un 0 à un tir raté. La séquence est bien toujours de taille $m*n$ car on élimine les positions déjà jouées (et on complète par des 0 pour les tirs non-effectués car la partie est terminée).
+Pour ce faire, on peut modéliser notre univers, l'ensemble des grilles de jeu de taille $m \times n$ contenant $k$ tirs réussis ($k$ étant le nombre de cases occupées par les bateaux), comme l'ensemble des séquences de digits binaires $\Omega = \{(c_1,\ldots,c_{m \cdot n}) \in \mathbb{B}^{m \cdot n}\}$.\
+Un 1 correspond à un tir réussi, un 0 à un tir raté. La séquence est bien toujours de taille $m \times n$ car on élimine les positions déjà jouées (et on complète par des 0 pour les tirs non-effectués car la partie est terminée).
 
 On peut alors exprimer le nombre de grilles de jeu gagnantes en au plus $x$ coups, $|X \leq x|$, comme le nombre de séquences de longueur $x$ contenant $k$ 1, $C^k_x$. On en déduit la loi de probabilité et l'espérance qui s'en suit :
 
 \begin{alignat*}{2}
 P(X = x) &= \frac{|X \leq x| - |X \leq x-1|}{|\Omega|}
-         &= \frac{C^k_x - C^k_{x-1}}{C^k_{m*n}}
+&= \frac{C^k_x - C^k_{x-1}}{C^k_{m \cdot n}}
 \end{alignat*}
-$$E(X) = \sum_{x=k}^{m*n}{P(X = x) * x}$$
+$$E(X) = \sum_{x=k}^{m \cdot n}{x \cdot P(X = x)}$$
 
-Dans notre cas où $k = 17$ et $m*n = 10*10 = 100$, on trouve $E(X) \approx 95,39$.
+Dans notre cas où $k = 17$ et $m \cdot n = 10 \cdot 10 = 100$, on trouve $E(X) \approx 95,39$.
 
 ### Comparaison avec l'espérance expérimentale
 
@@ -93,4 +93,47 @@ On calcule ensuite la distribution expérimentale en lançant $N = 1000$ itérat
 
 Les deux distributions semblent donc bien concorder. On observe en effet une espérance expérimentale qui oscille entre 95 et 96 sur plusieurs expériences, et des valeurs qui se rapprochent encore plus de l'espérance théorique lorsqu'on augmente N (nous ne sommes pas allés au-delà de $N = 10000$ pour des raisons de temps de calcul).
 
-<!--$$P(X=x) = \frac{C^{17}_{x} - C^{17}_{x-1}}{C^{17}_{100}}$$-->
+Senseur imparfait : à la recherche de l'USS Scorpion
+====================================================
+
+Question 1
+----------
+
+\begin{flalign*}
+& P(Y_i = 1) = \pi_i \\
+& P(Y_i = 0) = 1 - P(Y_i = 1) = 1 - \pi_i
+\end{flalign*}
+
+\begin{flalign*}
+& P(Z_i = 0 | Y_i = 0) = 1 \\
+& P(Z_i = 1 | Y_i = 0) = 0 \\
+& P(Z_i = 0 | Y_i = 1) = 1 - p_s \\
+& P(Z_i = 1 | Y_i = 1) = p_s
+\end{flalign*}
+
+Question 2
+----------
+
+\begin{flalign*}
+P(Y_k = 1 | Z_k = 0) = \frac{P(Y_k = 1 \cap Z_k = 0)}{P(Z_k = 0)}
+= \frac{P(Z_k = 0 | Y_k = 1) \cdot P(Y_k = 1)}{P(Z_k = 0)}
+\end{flalign*}
+
+Question 3
+----------
+
+\begin{flalign*}
+P(Y_k = 1 | Z_k = 0) &= \frac{P(Z_k = 0 | Y_k = 1) \cdot P(Y_k = 1)}{P(Z_k = 0)} \\
+&= \frac{(1 - p_s) \cdot \pi_k}{P(Z_k = 0 | Y_k = 0) \cdot P(Y_k = 0) + P(Z_k = 0 | Y_k = 1) \cdot P(Y_k = 1)} \\
+&= \frac{(1 - p_s) \cdot \pi_k}{1 \cdot (1 - \pi_k) + (1 - p_s) \cdot \pi_k} \\
+&= \frac{\pi_k - \pi_kp_s}{1 - \pi_kp_s}
+\end{flalign*}
+
+Pour mettre à jour $\pi_k$, il suffit de lui affecter la nouvelle valeur de $P(Y_k = 1)$, qui en présence de la nouvelle information $Z_k = 0$, est égale à la probabilité $P(Y_k = 1 | Z_k = 0)$ que l'on vient de calculer :
+$$\pi_k \leftarrow \frac{\pi_k - \pi_kp_s}{1 - \pi_kp_s}$$
+
+Question 4
+----------
+
+Pour mettre à jour $\pi_{i}$ pour $i \neq k$, on ajoute de manière uniforme la différence $\pi^t_k - \pi^{t-1}_k$, avec $\pi^t_k$ la nouvelle valeur de $\pi_k$, et $\pi^{t-1}_k$ la valeur de $\pi_k$ avant mise à jour :
+$$\pi^t_i \leftarrow \frac{1}{N-1} \left(\pi^t_k - \pi^{t-1}_k\right)$$
