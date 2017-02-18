@@ -23,6 +23,7 @@ DIR = {
 class Grille(np.ndarray):
     def __init__(self):
         self.boats = {}
+        self.shot = []
 
     def __new__(cls, taille=(10,10)):
         return np.zeros(taille).view(cls)
@@ -52,7 +53,10 @@ class Grille(np.ndarray):
         if self.peut_placer(bateau, position, direction):
             slice = self.slice_index(bateau, position, direction)
             boat = np.array([bateau] * LONG[bateau]).reshape(self[slice].shape)
-            self.boats[bateau] = slice
+            l = []
+            for i in zip(slice[0], slice[1]):
+                l.append(i)
+            self.boats[bateau] = l
             self[slice] = boat
             return self
         else:
@@ -95,11 +99,13 @@ class Grille(np.ndarray):
     # (0, -1) -> miss
     # (1, -1) -> hit, nothing sunk
     def shoot(self, position):
-        x, y = position
+        y, x = position
+        position = x, y
         boat_type = self.at(position)
+        self.set(position, 0)
         neigh = self.neighbors(position)
         slice = None
-        if boat_type not in neigh:
+        if boat_type not in self.ravel():
             slice = self.boats[boat_type]
         return (boat_type, slice)
 
