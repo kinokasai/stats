@@ -33,6 +33,10 @@ def stnl(s):
     return [ctn(char) for char in s]
 
 
+def nlts(nl):
+    return ''.join([ntc(n) for n in nl])
+
+
 def read_fasta(file_name):
     file = open(file_name)
     lines = [line.rstrip('\n') for line in file if line[0] != '>']

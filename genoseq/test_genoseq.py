@@ -1,6 +1,7 @@
 import unittest
 from unittest import TestCase
-from genoseq import *
+from fixation import *
+
 
 class TestGenoseq(TestCase):
     def test_read_fasta(self):
@@ -32,7 +33,7 @@ class TestGenoseq(TestCase):
 
     def test_freq_letters(self):
         l = stnl('GATTACAACT')
-        expected = (4/10, 2/10, 1/10, 3/10)
+        expected = (4 / 10, 2 / 10, 1 / 10, 3 / 10)
         out = freq_letters(l)
         self.assertEqual(out, expected)
 
@@ -64,6 +65,23 @@ class TestGenoseq(TestCase):
         cnt_out = count_letters(out)
         self.assertEqual(cnt_out[2], 0)
         self.assertGreater(cnt_out[0], cnt_out[1] + cnt_out[2])
+
+    def test_encode(self):
+        word = 'TAC'
+        expected = 49
+        out = encode(word, len(word))
+        self.assertEqual(out, expected);
+
+    def test_decode(self):
+        expected = stnl('TAC')
+        out = decode(49, 3)
+        self.assertEqual(expected, out)
+
+    def test_count_words(self):
+        expected = {'AT': 2, 'CA': 1, 'TC': 1}
+        out = count_words(stnl('ATCAT'), 2)
+        self.assertEqual(expected, out)
+
 
 if __name__ == '__main__':
     unittest.main()
