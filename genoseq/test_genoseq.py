@@ -6,7 +6,7 @@ from fixation import *
 class TestGenoseq(TestCase):
     def test_read_fasta(self):
         l = read_fasta("sequences/ACTG.seq")
-        expected = [[0, 1, 3, 2]]
+        expected = [0, 1, 3, 2]
         self.assertEqual(l, expected)
 
     def test_ctn(self):

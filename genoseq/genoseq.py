@@ -41,8 +41,11 @@ def read_fasta(file_name):
     file = open(file_name)
     lines = [line.rstrip('\n') for line in file if line[0] != '>']
     acids = [[ctn(char) for char in line] for line in lines]
+    seq = []
+    for s in acids:
+        seq += s
     file.close()
-    return acids
+    return seq
 
 
 def count_letters(nlist):

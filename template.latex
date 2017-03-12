@@ -245,7 +245,7 @@ $endfor$
 \vfill
 \hrule
 \begin{flushright}
-\small Professeur : $for(teacher)$$teacher$$sep$ \and $endfor$
+\small Professeurs : $for(teacher)$$teacher$\\$endfor$
 \end{flushright}
 
 \newpage
