@@ -41,19 +41,37 @@ Soit $a \in \{0,1,2,3\}$ la variable correspondant à la notation en nombre enti
 On note $p_a$ la probabilité pour $a$ d'être tirée dans un modèle aléatoire de la séquence, qui correspond ici à la fréquence d'apparition de $a$ dans le génome.  
 On note $n^w_a$ le nombre d'occurrences de $a$ dans $w$.
 
-On remarque que l'ordre des lettres dans $w$ n'a aucune importance ici, seul le nombre d'occurrences influe sur la probabilité d'apparition de $w$ dans la séquence : on s'attend en effet à avoir moins d'occurrences du mot si celui-ci contient un plus grand nombre de lettres.
-Chaque lettre $a$ possède ainsi une probabilité $\left(p_a\right)^{n^w_a}$ d'apparaître $n^w_a$ fois dans $w$.
+On remarque que l'ordre des lettres dans $w$ n'a aucune importance ici, seul le nombre d'occurrences influe sur la probabilité d'apparition de $w$ dans la séquence : on s'attend en effet à avoir moins d'occurrences du mot si celui-ci contient un plus grand nombre de lettres.  
 
-On peut alors calculer la probabilité d'apparition de $w$ à une position donnée dans la séquence en multipliant les probabilités d'apparition de chaque lettre dans $w$ :
+On peut alors calculer la probabilité de tirer $w$ à une position donnée dans la séquence en multipliant les probabilités de tirer chaque lettre $a$ $n^w_a$ fois :
 $$\prod_{a}{\left(p_a\right)^{n^w_a}}$$
 
-Pour déterminer finalement l'espérance théorique du nombre d'occurrences $N^l_w$ de $w$ dans la séquence, on cumule la probabilité que l'on vient de calculer pour chaque position possible de $w$.  
+Pour déterminer le nombre théorique d'occurrences $N^l_w$ de $w$ dans la séquence, on cumule la probabilité que l'on vient de calculer pour chaque position possible de $w$.  
 Sachant que $w$ est de longueur $\sum_{a}{n^w_a}$ et qu'on a donc $l - \sum_{a}{n^w_a} + 1$ positions possibles, on obtient :
 $$N^l_w = \prod_{a}{\left(p_a\right)^{n^w_a}} \times \left(l - \sum_{a}{n^w_a} + 1\right)$$
 
 La formule est implémentée dans la fonction `expected_counts` du module `fixation.py` qui l'applique à tous les mots de longueur $k$.
 
 ### Question 3
+
+On cherche à évaluer à quel point les nombres d'occurrences des mots de longueur $k$ observés sur les séquences PHO, MET et GAL s'écartent des nombres d'occurrences théoriques attendus.
+
+Pour cela nous avons implémenté la fonction `plot_counts` dans le module `fixation.py` qui nous permet d'afficher un graphe de dispersion du nombre observé en fonction du nombre attendu pour différentes séquences et différentes valeurs de k. On obtient les résultats suivants :
+
+![Nombres d'occurrences des mots de taille k dans le génome de *S. cerevisae*](img/scatter_counts.png){width=90%}
+
+La droite rouge correspond à l'enrichissement relatif : les points situés au-dessus (resp. en-dessous) de la droite sont les mots dont le nombre d'occurrences observé est supérieur (resp. inférieur) au nombre d'occurrences attendu.
+
+On voit que le nombre d'occurrences observés suit globalement le nombre d'occurrences attendu. Aussi, comme nous l'avions prévu, plus la longueur du mot $k$ est grande, et plus sa fréquence d'apparition est proche de 0.
+
+Néanmoins on remarque un fait intéressant : plus $k$ est grand, et plus on observe un petit nombre de mots bien plus fréquents que les autres.  
+On peut conjecturer que ces mots très fréquents sont caractéristiques du génome de *S. cerevisae*.
+
+Par la suite nous avons décidé d'expérimenter un peu plus avec ces valeurs en dessinant la distribution des nombres d'occurrences observés selon leur indice lexicographique :
+
+![Distribution des nombres d'occurrences observés des mots de taille k dans le génome de *S. cerevisae*](img/distrib_obs_counts.png){width=90%}
+
+On remarque alors que quelque soit la valeur de $k$, la distribution est très similaire, ce qui ce voit tout particulièrement sur les positions relatives des pics, qui correspondent aux mots caractéristiques trouvés précédemment.
 
 ## Simulation de séquences aléatoires
 
