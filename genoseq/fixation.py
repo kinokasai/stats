@@ -1,6 +1,8 @@
-from genoseq import *
-import matplotlib.pyplot as plt
 import math
+import matplotlib.pyplot as plt
+
+from genoseq import *
+from utils import grid_axes
 
 
 def nlists(size):
@@ -30,13 +32,12 @@ def count_words(nlist, size):
     return counts.tolist()
 
 
-def expected_counts(nlist, size):
-    freqs = freq_letters(nlist)
+def expected_counts(model, k, l):
+    n = (l-k+1)
     counts = []
-    for w in nlists(size):
-        n = count_letters(w)
-        count = np.prod([freqs[a]**n[a] for a in range(4)]) * (len(nlist) - size + 1)
-        counts.append(count)
+    for w in nlists(k):
+        p = prob(w, model)
+        counts.append(p*n)
     return counts
 
 
@@ -45,17 +46,12 @@ def plot_counts(nlists, sizes):
     nlists -- dict in the form {nlist_label: nlist}
     sizes -- list of word sizes
     """
-    grid_size = math.ceil(math.sqrt(len(sizes)))
-    axes = []
-    for i in range(len(sizes)):
-        y = i // grid_size
-        x = i % grid_size
-        axes.append(plt.subplot2grid((grid_size, grid_size), (y, x)))
+    axes = grid_axes(len(sizes))
 
     for i in range(len(sizes)):
         count_max = 0
         for label, nlist in nlists.items():
-            exp = expected_counts(nlist, sizes[i])
+            exp = expected_counts(freq_letters(nlist), sizes[i], len(nlist))
             obs = count_words(nlist, sizes[i])
             axes[i].scatter(exp, obs, s=50, label=label, marker=".")
             # axes[i].plot(np.arange(len(obs)), obs, label=label)

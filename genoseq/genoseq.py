@@ -17,7 +17,7 @@ ntc_dict = {
 
 def ctn(char):
     try:
-        return ctn_dict[char]
+        return ctn_dict[char.upper()]
     except KeyError:
         return -1
 
@@ -39,7 +39,7 @@ def nlts(nl):
 
 def read_fasta(file_name):
     file = open(file_name)
-    lines = [line.rstrip('\n') for line in file if line[0] != '>']
+    lines = [line.rstrip('\n') for line in file if line[0] not in ['>',';']]
     acids = [[ctn(char) for char in line] for line in lines]
     seq = []
     for s in acids:
@@ -51,14 +51,13 @@ def read_fasta(file_name):
 def count_letters(nlist):
     cnt = np.zeros(4, dtype=np.int)
     for n in nlist:
+        if n == -1: continue
         cnt[n] += 1
     return tuple(cnt)
 
 
 def freq_letters(nlist):
-    tpl = count_letters(nlist)
-    l = [n / sum(tpl) for n in tpl]
-    return tuple(l)
+    return tuple(np.array(count_letters(nlist)) / len(nlist))
 
 
 def logprob(nlist, model):
@@ -66,7 +65,16 @@ def logprob(nlist, model):
 
 
 def flogprob(tpl, model):
-    return np.sum(np.log(model[j]) for j in range(4) for _ in range(tpl[j]))
+    prob = 0.
+    for a in range(4):
+        pa = np.log(model[a])
+        prob += pa * tpl[a]
+    return prob
+
+
+def prob(nlist, model):
+    tpl = count_letters(nlist)
+    return np.exp(flogprob(tpl, model))
 
 
 def simul_seq(len, model):

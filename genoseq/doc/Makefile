@@ -4,7 +4,7 @@ TEMPL = ../../template.latex
 all: $(NAME).pdf
 
 $(NAME).pdf: $(NAME).md $(TEMPL)
-	pandoc -s -f markdown+table_captions -t latex --latex-engine=pdflatex --template=$(TEMPL) $< -o $@
+	pandoc -s -f markdown+table_captions -t latex --latex-engine=pdflatex --template=$(TEMPL) $< --filter pandoc-fignos -o $@
 
 view: $(NAME).pdf
 	mupdf $^
