@@ -1,6 +1,8 @@
 import numpy as np
 import pydot
 
+from utils import methodaliases
+
 
 class Arc:
     """Classe représentant un arc dans un graphe probabiliste.
@@ -62,6 +64,7 @@ class Node:
             arc.plot(graph)
 
 
+@methodaliases(add_arc="addArc", update_trans="updateProbas", write_png="writeGraph")
 class SimpleWeb:
     """Classe représentant un graphe probabiliste.
 
@@ -89,13 +92,13 @@ class SimpleWeb:
         on le construit et le rajoute au graphe.
 
         Paramètres:
-            tail_id (int): Identifiant du noeud sortant
-            head_id (int): Identifiant du noeud entrant
+            tail_id (int): Identifiant du noeud sortant.
+            head_id (int): Identifiant du noeud entrant.
 
         Exceptions:
             IndexError: Si l'un des identifiants n'est pas compris entre
                 0 et le nombre maximum de noeuds du graphe.
-            ValueError: Si l'arc existe déjà
+            ValueError: Si l'arc existe déjà.
         """
         for id_ in (tail_id, head_id):
             if id_ < 0 or id_ >= self.nb_max_nodes:
@@ -131,7 +134,7 @@ class SimpleWeb:
         """Écrit une représentation graphique du graphe dans un fichier PNG.
 
         Paramètres:
-            path (str): chemin du fichier PNG
+            path (str): Chemin du fichier PNG.
         """
         graph = pydot.Dot(graph_type='digraph')
         for node in self.nodes.values():
@@ -141,21 +144,21 @@ class SimpleWeb:
 
 if __name__ == "__main__":
     n1 = SimpleWeb(10)
-    n1.add_arc(0, 1)
-    n1.add_arc(0, 4)
-    n1.add_arc(1, 2)
-    n1.add_arc(2, 3)
-    n1.add_arc(2, 4)
-    n1.add_arc(3, 9)
-    n1.add_arc(4, 2)
-    n1.add_arc(4, 5)
-    n1.add_arc(4, 7)
-    n1.add_arc(5, 6)
-    n1.add_arc(6, 5)
-    n1.add_arc(6, 7)
-    n1.add_arc(7, 8)
-    n1.add_arc(8, 7)
-    n1.add_arc(9, 2)
-    n1.update_trans()
-    n1.write_png("n1.png")
+    n1.addArc(0, 1)
+    n1.addArc(0, 4)
+    n1.addArc(1, 2)
+    n1.addArc(2, 3)
+    n1.addArc(2, 4)
+    n1.addArc(3, 9)
+    n1.addArc(4, 2)
+    n1.addArc(4, 5)
+    n1.addArc(4, 7)
+    n1.addArc(5, 6)
+    n1.addArc(6, 5)
+    n1.addArc(6, 7)
+    n1.addArc(7, 8)
+    n1.addArc(8, 7)
+    n1.addArc(9, 2)
+    n1.updateProbas()
+    n1.writeGraph("n1.png")
     print(n1)
