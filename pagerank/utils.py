@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def methodaliases(**kwargs):
     """Décorateur pour ajouter des alias à certaines méthodes d'une classe.
 
@@ -9,3 +12,16 @@ def methodaliases(**kwargs):
             setattr(cls, alias, getattr(cls, method_name))
         return cls
     return wrap
+
+
+def sample_index(model):
+    """Tire un index aléatoirement selon une distribution de probabilités.
+
+    Paramètres:
+        model (Sequence[float]): Distribution de probabilités.
+    """
+    cum_model = np.array(model).cumsum()
+    n = np.random.ranf()
+    for i in range(len(model)):
+        if n < cum_model[i]:
+            return i

@@ -8,8 +8,7 @@ class Arc:
     """Classe représentant un arc dans un graphe probabiliste.
 
     Attributs:
-        trans (np.ndarray): Référence vers la matrice de transition
-            du graphe contenant l'arc.
+        trans (np.ndarray[float]): Référence vers la matrice de transition du graphe contenant l'arc.
         tail (Node): Référence vers le noeud sortant.
         head (Node): Référence vers le noeud entrant.
         prob (Optional[float]): Probabilité de transition associée à l'arc.
@@ -58,20 +57,20 @@ class Node:
 
     def plot(self, graph):
         """Dessine le noeud dans un graphe pydot."""
-        node = pydot.Node(self.id, shape="circle")
+        node = pydot.Node(self.id, shape='circle')
         graph.add_node(node)
         for arc in self.out_arcs:
             arc.plot(graph)
 
 
-@methodaliases(add_arc="addArc", update_trans="updateProbas", write_png="writeGraph")
+@methodaliases(add_arc='addArc', update_trans='updateProbas', write_png='writeGraph')
 class SimpleWeb:
     """Classe représentant un graphe probabiliste.
 
     Attributs:
         nb_max_nodes (int): Nombre maximum de noeuds que peut contenir le graphe.
         nodes (Dict[int, Node]): Dictionnaire {identifiant: noeud}.
-        trans (np.ndarray): Matrice de transition.
+        trans (np.ndarray[float]): Matrice de transition.
     """
     def __init__(self, nb_max_nodes):
         """Construit un graphe sans arcs.
@@ -140,25 +139,3 @@ class SimpleWeb:
         for node in self.nodes.values():
             node.plot(graph)
         graph.write_png(path)
-
-
-if __name__ == "__main__":
-    n1 = SimpleWeb(10)
-    n1.addArc(0, 1)
-    n1.addArc(0, 4)
-    n1.addArc(1, 2)
-    n1.addArc(2, 3)
-    n1.addArc(2, 4)
-    n1.addArc(3, 9)
-    n1.addArc(4, 2)
-    n1.addArc(4, 5)
-    n1.addArc(4, 7)
-    n1.addArc(5, 6)
-    n1.addArc(6, 5)
-    n1.addArc(6, 7)
-    n1.addArc(7, 8)
-    n1.addArc(8, 7)
-    n1.addArc(9, 2)
-    n1.updateProbas()
-    n1.writeGraph("n1.png")
-    print(n1)
