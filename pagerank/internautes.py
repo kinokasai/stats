@@ -55,7 +55,6 @@ class Simulation:
             while t < nb_max_iters and self.epsilon >= epsilon:
                 new_state = self.step(t)
                 self.epsilon = max([abs(self.state[i] - new_state[i]) for i in range(self.dim)])
-                print(self.epsilon)
                 if t % self.epsilon_interval == 0:
                     log.write(str(self.epsilon) + '\n')
                 self.state = new_state

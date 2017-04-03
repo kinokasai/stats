@@ -17,7 +17,7 @@ bob.goTo(3)
 # Bob conserve les valeurs de epsilon
 # toutes les 100 itérations
 # dans ce fichier
-bob.trace(100, "epsilons_v1.txt")
+bob.trace(1, "epsilons_v1.txt")
 
 # Bob se ballade 10000 fois
 # ou jusqu'à epsilon < 0.01
@@ -29,5 +29,5 @@ bob.showFrequencies()
 
 
 fred = InternauteV2(nanoweb)
-fred.trace(100, "epsilons_v2.txt")
+fred.trace(1, "epsilons_v2.txt")
 fred.walk(10000, 0.01)
