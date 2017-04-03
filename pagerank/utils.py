@@ -19,6 +19,9 @@ def sample_index(model):
 
     Paramètres:
         model (Sequence[float]): Distribution de probabilités.
+
+    Retourne:
+        i (int): L'index aléatoirement tiré.
     """
     cum_model = np.array(model).cumsum()
     n = np.random.ranf()

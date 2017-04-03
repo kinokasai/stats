@@ -63,7 +63,7 @@ class Node:
             arc.plot(graph)
 
 
-@methodaliases(add_arc='addArc', update_trans='updateProbas', write_png='writeGraph')
+@methodaliases(add_arc='addArc', update_trans='updateProbas', write_png='writeGraph', next_step='nextStep')
 class SimpleWeb:
     """Classe représentant un graphe probabiliste.
 
@@ -139,3 +139,6 @@ class SimpleWeb:
         for node in self.nodes.values():
             node.plot(graph)
         graph.write_png(path)
+
+    def next_step(self, pi_t):
+        return np.matmul(pi_t, self.trans)
