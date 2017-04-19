@@ -1,33 +1,57 @@
 from sys import path
 path.append('.')
 
-from nanowebs import creeNanoWeb1
+import matplotlib.pyplot as plt
+
+from nanowebs import *
 from internautes import *
+from utils import grid_axes
 
+nanowebs = [creeNanoWeb1(), creeNanoWeb2(), creeNanoWeb3()]
+N = 10000
+epsilon = 0.01
+interval = 1
+init_state = 1
 
-# Création du SimpleWeb
-nanoweb = creeNanoWeb1()
+i = 0
+for nanoweb in nanowebs:
+    i += 1
 
-# Bob se ballade dans le nanoweb
-bob = Internaute(nanoweb)
+    bob = Internaute(nanoweb)
+    bob.goTo(init_state)
+    bob.trace(interval, 'logs/epsilons_internaute_{}.txt'.format(i))
+    bob.walk(N, epsilon)
 
-# Bob est dans le noeud 3
-bob.goTo(3)
+    fred = Kolmogogol(nanoweb)
+    fred.trace(interval, 'logs/epsilons_kolmogogol_{}.txt'.format(i))
+    # fred.trace(interval, 'logs/epsilons_kolmogogol_uniform_{}.txt'.format(i))
+    init = np.zeros(fred.ord)
+    init[init_state] = 1
+    # init = np.ones(fred.ord) / fred.ord
+    fred.walk(N, epsilon, init)
 
-# Bob conserve les valeurs de epsilon
-# toutes les 100 itérations
-# dans ce fichier
-bob.trace(1, "epsilons_v1.txt")
+    print()
 
-# Bob se ballade 10000 fois
-# ou jusqu'à epsilon < 0.01
-bob.walk(10000, 0.01)
+for i in range(len(nanowebs)):
+    with open('logs/epsilons_internaute_{}.txt'.format(i+1), 'r') as log:
+        epsilons = [float(line) for line in log]
+        plt.step(np.arange(len(epsilons)), epsilons, label='nanoweb {}'.format(i+1))
+plt.xlim((0,100))
+plt.xlabel('Pas de temps ($t$)')
+plt.ylabel('Convergence ($\epsilon$)')
+plt.legend()
+plt.savefig('doc/img/epsilons_internaute_t{}.png'.format(interval))
 
-# Bob affiche la fréquence de sa présence
-# dans chaque noeud durant sa promenade
-bob.showFrequencies()
+plt.clf()
 
-
-fred = InternauteV2(nanoweb)
-fred.trace(1, "epsilons_v2.txt")
-fred.walk(10000, 0.01)
+for i in range(len(nanowebs)):
+    with open('logs/epsilons_kolmogogol_{}.txt'.format(i+1), 'r') as log:
+    # with open('logs/epsilons_kolmogogol_uniform_{}.txt'.format(i+1), 'r') as log:
+        epsilons = [float(line) for line in log]
+        plt.step(np.arange(len(epsilons)), epsilons, label='nanoweb {}'.format(i+1))
+plt.xlim((0,100))
+plt.xlabel('Pas de temps ($t$)')
+plt.ylabel('Convergence ($\epsilon$)')
+plt.legend()
+plt.savefig('doc/img/epsilons_kolmogogol_t{}.png'.format(interval))
+# plt.savefig('doc/img/epsilons_kolmogogol_uniform_t{}.png'.format(interval))

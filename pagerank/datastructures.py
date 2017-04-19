@@ -1,5 +1,6 @@
 import numpy as np
 import pydot
+import random
 
 from utils import methodaliases
 
@@ -22,8 +23,8 @@ class Arc:
     def update_trans(self, prob):
         """Met à jour la probabilité de transition associée à l'arc.
 
-        S'occupe aussi de mettre à jour la case correspondante dans la
-        matrice de transition du graphe contenant l'arc.
+        S'occupe aussi de mettre à jour le coefficient correspondant 
+        dans la matrice de transition du graphe contenant l'arc.
 
         Paramètres:
             prob (float): Nouvelle probabilité de transition.
@@ -68,27 +69,24 @@ class SimpleWeb:
     """Classe représentant un graphe probabiliste.
 
     Attributs:
-        nb_max_nodes (int): Nombre maximum de noeuds que peut contenir le graphe.
+        n (int): Nombre de noeuds que contient le graphe.
         nodes (Dict[int, Node]): Dictionnaire {identifiant: noeud}.
         trans (np.ndarray[float]): Matrice de transition.
     """
-    def __init__(self, nb_max_nodes):
+    def __init__(self, n):
         """Construit un graphe sans arcs.
 
         Exceptions:
-            ValueError: Si nb_max_nodes < 1.
+            ValueError: Si n < 1.
         """
-        if nb_max_nodes < 1:
+        if n < 1:
             raise ValueError("Un SimpleWeb doit contenir au moins 1 noeud")
-        self.nb_max_nodes = nb_max_nodes
-        self.nodes = {}
-        self.trans = np.zeros((nb_max_nodes,) * 2)
+        self.n = n
+        self.nodes = [Node(ident) for ident in range(n)]
+        self.trans = np.zeros((n,) * 2)
 
     def add_arc(self, tail_id, head_id):
         """Construit un arc sans probabilité entre deux noeuds.
-
-        Si le noeud correspondant à un des identifiants n'existe pas encore,
-        on le construit et le rajoute au graphe.
 
         Paramètres:
             tail_id (int): Identifiant du noeud sortant.
@@ -100,22 +98,14 @@ class SimpleWeb:
             ValueError: Si l'arc existe déjà.
         """
         for id_ in (tail_id, head_id):
-            if id_ < 0 or id_ >= self.nb_max_nodes:
+            if id_ < 0 or id_ >= self.n:
                 raise IndexError("Identifiant de noeud invalide: {}".format(id_))
 
-        try:
-            tail = self.nodes[tail_id]
-            for arc in tail.out_arcs:
-                if arc.head.id == head_id:
-                    raise ValueError("L'arc {} -> {} existe déjà".format(tail_id, head_id))
-        except KeyError:
-            tail = Node(tail_id)
-            self.nodes[tail_id] = tail
-        try:
-            head = self.nodes[head_id]
-        except KeyError:
-            head = Node(head_id)
-            self.nodes[head_id] = head
+        tail = self.nodes[tail_id]
+        for arc in tail.out_arcs:
+            if arc.head.id == head_id:
+                raise ValueError("L'arc {} -> {} existe déjà".format(tail_id, head_id))
+        head = self.nodes[head_id]
 
         arc = Arc(self.trans, tail, head)
         tail.out_arcs.append(arc)
@@ -123,7 +113,7 @@ class SimpleWeb:
 
     def update_trans(self):
         """Met à jour les probabilités de transition."""
-        for node in self.nodes.values():
+        for node in self.nodes:
             node.update_trans()
 
     def __str__(self):
@@ -136,9 +126,76 @@ class SimpleWeb:
             path (str): Chemin du fichier PNG.
         """
         graph = pydot.Dot(graph_type='digraph')
-        for node in self.nodes.values():
+        for node in self.nodes:
             node.plot(graph)
         graph.write_png(path)
 
     def next_step(self, pi_t):
         return np.matmul(pi_t, self.trans)
+
+    def convergence(self, n, epsilon):
+        """Calcule l'évolution de la convergence des puissances de la matrice de transition.
+
+        Paramètres:
+            n (int): Calcule au plus jusqu'à la puissance n.
+            epsilon (float): Seuil de convergence.
+        """
+        trans = self.trans.copy()
+        eps = 1
+        epsilons = []
+        i = 1
+        while i < n and eps > epsilon:
+            new_trans = trans**2
+            eps = np.linalg.norm(trans - new_trans)
+            epsilons.append(eps)
+            trans = new_trans
+            i += 1
+        return epsilons
+
+    @staticmethod
+    def generate(n):
+        """Génère un SimpleWeb ergodique sans auto-référence (ne marche pas).
+
+        Paramètres:
+            n (int): Nombre de pages web.
+        """
+        if n < 4:
+            raise ValueError("Un SimpleWeb ergodique sans auto-référence doit contenir au moins 4 pages")
+
+        web = SimpleWeb(n)
+        pages = list(range(n))
+        accessible = [False] * n
+
+        for page in pages:
+            # On s'assure que la page est accessible depuis au moins une autre page
+            if not accessible[page]:
+                sources = pages.copy()
+                # Pas d'auto-référence
+                sources.remove(page)
+                # On évite les cycles de période 2
+                for link in web.nodes[page].out_arcs:
+                    sources.remove(link.head.id)
+                # On tire la source au hasard
+                source = random.choice(sources)
+                web.add_arc(source, page)
+                accessible[page] = True
+            web.update_trans()
+
+            # On génère un nouveau lien vers une autre page
+            targets = pages.copy()
+            # Pas d'auto-référence
+            targets.remove(page)
+            # On évite les cycles de période 2
+            for ref in web.nodes[page].in_arcs:
+                targets.remove(ref.tail.id)
+            # Le lien ne doit pas déjà exister
+            for link in web.nodes[page].out_arcs:
+                targets.remove(link.head.id)
+            # On tire la cible au hasard
+            if len(targets) == 0:
+                continue
+            target = random.choice(targets)
+            web.add_arc(page, target)
+            accessible[target] = True
+
+        return web

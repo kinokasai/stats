@@ -8,15 +8,13 @@ class Simulation:
 
     Attributs:
         web (SimpleWeb): Référence vers le SimpleWeb.
-        dim (int): Nombre d'états possibles.
-        state (np.ndarray[float]): Vecteur d'état (distribution de probabilités courante).
+        state (np.ndarray[float]): Vecteur d'état (distribution de probabilité courante).
         epsilon (float): Estimateur de convergence des probabilités.
         epsilon_path (str): Chemin du fichier où est enregistrée l'évolution de la convergence.
         epsilon_interval (int): Nombre d'itérations séparant deux échantillonnages de la convergence.
     """
     def __init__(self, web):
         self.web = web
-        self.dim = web.trans.shape[0]
 
     def trace(self, interval, path):
         """Configure la trace de l'évolution de la convergence."""
@@ -46,7 +44,7 @@ class Simulation:
             init_state (np.ndarray[float]): Vecteur d'état initial.
         """
         if init_state is None:
-            self.state = np.ones(self.dim) / self.dim
+            self.state = np.ones(self.web.n) / self.web.n
         else:
             self.state = init_state
         self.epsilon = 1
@@ -54,11 +52,12 @@ class Simulation:
         with open(self.epsilon_path, 'w') as log:
             while t < nb_max_iters and self.epsilon >= epsilon:
                 new_state = self.step(t)
-                self.epsilon = max([abs(self.state[i] - new_state[i]) for i in range(self.dim)])
+                self.epsilon = max([abs(self.state[i] - new_state[i]) for i in range(self.web.n)])
                 if t % self.epsilon_interval == 0:
                     log.write(str(self.epsilon) + '\n')
                 self.state = new_state
                 t += 1
+            print(np.around(self.state, 3))
 
 
 @methodaliases(goto='goTo', show_freqs='showFrequencies')
@@ -79,22 +78,21 @@ class Internaute(Simulation):
 
     def step(self, t):
         if t == 0:
-            self.freqs = np.zeros(self.dim)
-            self.freqs[self.page.id] += 1
-            self.state = self.freqs
+            self.freqs = np.zeros(self.web.n)
+            self.state = self.freqs.copy()
 
         model = self.web.trans[self.page.id]
         next_page_id = sample_index(model)
         self.goto(next_page_id)
         self.freqs[next_page_id] += 1
 
-        return self.freqs / (t+2)
+        return self.freqs / (t+1)
 
     def show_freqs(self):
         print(self.freqs)
 
 
-class InternauteV2(Simulation):
+class Kolmogogol(Simulation):
     """Simulation approximant la distribution stationnaire avec l'équation matricielle de transition."""
     def step(self, t):
         return self.web.next_step(self.state)
