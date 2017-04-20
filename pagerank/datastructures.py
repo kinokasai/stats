@@ -143,31 +143,35 @@ class SimpleWeb:
         trans = self.trans.copy()
         eps = 1
         epsilons = []
-        i = 1
-        while i < n and eps > epsilon:
-            new_trans = trans**2
+        k = 2
+        while k <= n and eps > epsilon:
+            new_trans = np.matmul(trans, self.trans)
             eps = np.linalg.norm(trans - new_trans)
             epsilons.append(eps)
             trans = new_trans
-            i += 1
+            k += 1
         return epsilons
 
     @staticmethod
     def generate(n):
-        """Génère un SimpleWeb ergodique sans auto-référence (ne marche pas).
+        """Génère un SimpleWeb ergodique sans auto-référence.
+
+        Actuellement l'algorithme ne fonctionne pas,
+        certaines des chaînes générées ne sont pas irréductibles.
 
         Paramètres:
             n (int): Nombre de pages web.
         """
-        if n < 4:
-            raise ValueError("Un SimpleWeb ergodique sans auto-référence doit contenir au moins 4 pages")
+        if n < 3:
+            raise ValueError("Un SimpleWeb ergodique sans auto-référence doit contenir au moins 3 pages")
 
         web = SimpleWeb(n)
         pages = list(range(n))
         accessible = [False] * n
+        leavable = [False] * n
 
         for page in pages:
-            # On s'assure que la page est accessible depuis au moins une autre page
+            # On génère un lien entrant si nécessaire
             if not accessible[page]:
                 sources = pages.copy()
                 # Pas d'auto-référence
@@ -178,24 +182,24 @@ class SimpleWeb:
                 # On tire la source au hasard
                 source = random.choice(sources)
                 web.add_arc(source, page)
+                # On met à jour le statut des 2 pages dans le réseau
                 accessible[page] = True
-            web.update_trans()
+                leavable[source] = True
 
-            # On génère un nouveau lien vers une autre page
-            targets = pages.copy()
-            # Pas d'auto-référence
-            targets.remove(page)
-            # On évite les cycles de période 2
-            for ref in web.nodes[page].in_arcs:
-                targets.remove(ref.tail.id)
-            # Le lien ne doit pas déjà exister
-            for link in web.nodes[page].out_arcs:
-                targets.remove(link.head.id)
-            # On tire la cible au hasard
-            if len(targets) == 0:
-                continue
-            target = random.choice(targets)
-            web.add_arc(page, target)
-            accessible[target] = True
+            # On génère un lien sortant si nécessaire
+            if not leavable[page]:
+                targets = pages.copy()
+                # Pas d'auto-référence
+                targets.remove(page)
+                # On évite les cycles de période 2
+                for link in web.nodes[page].in_arcs:
+                    targets.remove(link.tail.id)
+                # On tire la cible au hasard
+                target = random.choice(targets)
+                web.add_arc(page, target)
+                # On met à jour le statut des 2 pages dans le réseau
+                accessible[target] = True
+                leavable[page] = True
 
+        web.update_trans()
         return web

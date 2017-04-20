@@ -7,7 +7,7 @@ $(NAME).pdf: $(NAME).md $(TEMPL)
 	pandoc -s -f markdown+table_captions+definition_lists -t latex --latex-engine=pdflatex --template=$(TEMPL) $< --filter pandoc-fignos -o $@
 
 view: $(NAME).pdf
-	mupdf $^
+	zathura $^
 
 clean:
 	rm $(NAME).pdf

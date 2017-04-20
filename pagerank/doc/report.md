@@ -78,7 +78,8 @@ On peut maintenant avec cette algorithme choisir n'importe quelle distribution i
 
 # Puissances de matrices
 
-Pour tout $n \in \mathbb{N}$, la puissance de la matrice de transition $P^n$ représente les probabilités de transition du graphe en $n$ itérations.
+$\forall n \in \mathbb{N}$, la puissance de la matrice de transition $P^n$ représente les probabilités de transition en $n$ itérations.  
+$\lim_{n\to\infty} P^n$ est une matrice dont chaque ligne correspond à la distribution stationnaire quand elle existe.
 
 ## Question 9
 
@@ -86,12 +87,8 @@ On a implémenté dans *`datastructures.SimpleWeb.convergence`* un algorithme pe
 
 $$\epsilon = \left\|P^{t} - P^{t+1}\right\|$$
 
-On dessine alors la courbe d'évolution de la convergence pour les 3 nanowebs avec pour seuil $\epsilon \leq 10^{-10}$ (fig. @fig:epsilons_trans).
+On dessine alors la courbe d'évolution de la convergence pour les 3 nanowebs, avec pour seuil $\epsilon \leq 0.01$ (fig. @fig:epsilons_trans).
 
 ![Évolution de la convergence des puissances de $P$](img/epsilons_trans.png){#fig:epsilons_trans width=75%}
 
-On constate que les 3 nanowebs convergent avec une progression très similaire en exactement 7 itérations, à partir de $P^8$, ce qui est bien plus rapide que la convergence de la distribution de probabilités, malgré la très petite valeur du seuil de convergence.
-
-# Génération de Webs
-
-## Question 10
+Cette fois-ci, en plus du nanoweb 1, on a aussi le nanoweb 3 qui ne converge pas, ce qui nous paraît cohérent puisqu'il existe une sous-chaîne périodique (les pages $\{4,5\}$). On constate aussi que le nanoweb 2 met plus de temps à converger.

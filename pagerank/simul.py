@@ -25,7 +25,7 @@ for nanoweb in nanowebs:
     fred = Kolmogogol(nanoweb)
     fred.trace(interval, 'logs/epsilons_kolmogogol_{}.txt'.format(i))
     # fred.trace(interval, 'logs/epsilons_kolmogogol_uniform_{}.txt'.format(i))
-    init = np.zeros(fred.ord)
+    init = np.zeros(fred.web.n)
     init[init_state] = 1
     # init = np.ones(fred.ord) / fred.ord
     fred.walk(N, epsilon, init)
